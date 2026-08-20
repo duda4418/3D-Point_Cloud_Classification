@@ -1,121 +1,61 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
+import { useEffect, useState } from 'react'
+import { AuthLayout } from './auth/components/AuthLayout.jsx'
+import { getSession, signOut } from './auth/services/mockAuthService.js'
+import { SignInPage } from './auth/pages/SignInPage.jsx'
+import { SignUpPage } from './auth/pages/SignUpPage.jsx'
+import { WelcomePage } from './auth/pages/WelcomePage.jsx'
 import './App.css'
 
+const routes = {
+  '/': 'sign-in',
+  '/sign-in': 'sign-in',
+  '/sign-up': 'sign-up',
+}
+
+function getRoute() {
+  return routes[window.location.pathname] ?? 'sign-in'
+}
+
 function App() {
-  const [count, setCount] = useState(0)
+  const [route, setRoute] = useState(getRoute)
+  const [session, setSession] = useState(getSession)
+
+  useEffect(() => {
+    const handlePopState = () => setRoute(getRoute())
+    window.addEventListener('popstate', handlePopState)
+    return () => window.removeEventListener('popstate', handlePopState)
+  }, [])
+
+  const navigate = (path) => {
+    window.history.pushState({}, '', path)
+    setRoute(getRoute())
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  const handleSignOut = () => {
+    signOut()
+    setSession(null)
+    navigate('/sign-in')
+  }
+
+  if (session) {
+    return <WelcomePage user={session} onSignOut={handleSignOut} />
+  }
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+    <AuthLayout>
+      {route === 'sign-up' ? (
+        <SignUpPage
+          onAuthenticated={setSession}
+          onNavigateToSignIn={() => navigate('/sign-in')}
+        />
+      ) : (
+        <SignInPage
+          onAuthenticated={setSession}
+          onNavigateToSignUp={() => navigate('/sign-up')}
+        />
+      )}
+    </AuthLayout>
   )
 }
 
