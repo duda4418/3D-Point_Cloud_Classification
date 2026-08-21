@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { PasswordField } from '../components/PasswordField.jsx'
-import { TextField } from '../components/TextField.jsx'
+import { PasswordField } from '../../components/PasswordField.jsx'
+import { TextField } from '../../components/TextField.jsx'
 import { signUp } from '../services/mockAuthService.js'
 import { validateEmail, validateName, validatePassword } from '../validation.js'
 

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { AuthLayout } from './auth/components/AuthLayout.jsx'
+import { AuthLayout } from './components/AuthLayout.jsx'
 import { getSession, signOut } from './auth/services/mockAuthService.js'
 import { SignInPage } from './auth/pages/SignInPage.jsx'
 import { SignUpPage } from './auth/pages/SignUpPage.jsx'

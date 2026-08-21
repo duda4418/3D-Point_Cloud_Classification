@@ -1,4 +1,4 @@
-import { BrandMark } from '../components/BrandMark.jsx'
+import { BrandMark } from '../../components/BrandMark.jsx'
 
 export function WelcomePage({ user, onSignOut }) {
   return (
